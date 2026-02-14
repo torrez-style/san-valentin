@@ -1,0 +1,1025 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="theme-color" content="#d4c4e8">
+    <title>Para ti · San Valentín</title>
+
+    <!-- Open Graph — Vista previa en WhatsApp -->
+    <meta property="og:title" content="Para ti 💜 San Valentín">
+    <meta property="og:description" content="Abre este sobre y descubre lo que guardo para ti...">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="fotos/foto-1.jpeg">
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=Great+Vibes&display=swap" rel="stylesheet">
+
+    <!-- GSAP Animation Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+
+    <!-- tsParticles — Pétalos de lirio -->
+    <script src="https://cdn.jsdelivr.net/npm/tsparticles@2.12.0/tsparticles.bundle.min.js"></script>
+
+    <!-- Howler.js — Audio mejorado -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/howler/2.2.4/howler.min.js"></script>
+
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+    <!-- Contenedor de pétalos tsParticles -->
+    <div id="tsparticles"></div>
+
+    <!-- Texto de instrucción -->
+    <div class="instruction" id="instruction">
+        <span class="instruction-icon">
+            <i data-lucide="hand" class="icon-hand"></i>
+        </span>
+        <span>Toca el sobre para abrirlo</span>
+    </div>
+
+    <!-- Contenedor principal -->
+    <div class="scene" id="scene">
+        <div class="envelope-wrapper" id="envelopeWrapper" data-parallax="0.03">
+            <!-- Sobre -->
+            <div class="envelope" id="envelope">
+                <div class="envelope-back"></div>
+                <div class="envelope-liner"></div>
+                <div class="envelope-front">
+                    <div class="envelope-label">Para ti</div>
+                    <div class="wax-seal" id="waxSeal">
+                        <svg viewBox="0 0 64 64" class="seal-svg">
+                            <defs>
+                                <!-- === DEGRADADOS DE PROFUNDIDAD === -->
+                                <radialGradient id="sealBase" cx="42%" cy="36%" r="52%" fx="38%" fy="30%">
+                                    <stop offset="0%" stop-color="#dccfee"/>
+                                    <stop offset="25%" stop-color="#d4c4e8"/>
+                                    <stop offset="55%" stop-color="#c4b0db"/>
+                                    <stop offset="80%" stop-color="#b8a4d3"/>
+                                    <stop offset="100%" stop-color="#9083ab"/>
+                                </radialGradient>
+                                <!-- Brillo especular superior (luz cenital) -->
+                                <radialGradient id="sealSpecular" cx="36%" cy="28%" r="38%">
+                                    <stop offset="0%" stop-color="#efe8f5" stop-opacity="0.55"/>
+                                    <stop offset="50%" stop-color="#ede3f7" stop-opacity="0.15"/>
+                                    <stop offset="100%" stop-color="#c4b0db" stop-opacity="0"/>
+                                </radialGradient>
+                                <!-- Sombra inferior interna (profundidad concava) -->
+                                <radialGradient id="sealDepth" cx="55%" cy="65%" r="45%">
+                                    <stop offset="0%" stop-color="#7e7299" stop-opacity="0.3"/>
+                                    <stop offset="100%" stop-color="#a594c0" stop-opacity="0"/>
+                                </radialGradient>
+                                <!-- Brillo del borde (cera reflectante) -->
+                                <radialGradient id="rimLight" cx="50%" cy="50%" r="50%">
+                                    <stop offset="85%" stop-color="transparent"/>
+                                    <stop offset="94%" stop-color="rgba(235,228,248,0.2)"/>
+                                    <stop offset="100%" stop-color="rgba(215,205,235,0.05)"/>
+                                </radialGradient>
+
+                                <!-- === FILTRO DE TEXTURA DE CERA === -->
+                                <filter id="waxTexture" x="-5%" y="-5%" width="110%" height="110%">
+                                    <!-- Ruido granular de cera -->
+                                    <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="4" seed="8" result="noise"/>
+                                    <!-- Desplazamiento sutil para irregularidad de superficie -->
+                                    <feDisplacementMap in="SourceGraphic" in2="noise" scale="1.2" xChannelSelector="R" yChannelSelector="G" result="displaced"/>
+                                    <!-- Mezclar con original para no perder nitidez -->
+                                    <feBlend in="SourceGraphic" in2="displaced" mode="normal"/>
+                                </filter>
+
+                                <!-- === FILTRO DE RELIEVE/EMBOSS === -->
+                                <filter id="embossFilter" x="-10%" y="-10%" width="120%" height="120%">
+                                    <!-- Ruido base para bump map -->
+                                    <feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" seed="5" result="bumpNoise"/>
+                                    <!-- Luz difusa (relieve suave general) -->
+                                    <feDiffuseLighting in="bumpNoise" lighting-color="#f0eaf8" surfaceScale="1.5" diffuseConstant="0.7" result="diffLight">
+                                        <feDistantLight azimuth="225" elevation="45"/>
+                                    </feDiffuseLighting>
+                                    <!-- Componer con el gráfico original -->
+                                    <feComposite in="diffLight" in2="SourceGraphic" operator="in" result="textured"/>
+                                    <feBlend in="SourceGraphic" in2="textured" mode="soft-light"/>
+                                </filter>
+
+                                <!-- === FILTRO DE GRABADO (para el lirio tallado) === -->
+                                <filter id="carvedRelief" x="-8%" y="-8%" width="116%" height="116%">
+                                    <!-- Convertir a bump usando alpha -->
+                                    <feGaussianBlur in="SourceAlpha" stdDeviation="0.5" result="blur"/>
+                                    <!-- Luz especular para efecto de tallado -->
+                                    <feSpecularLighting in="blur" specularExponent="18" lighting-color="#f6f2fb" surfaceScale="3" specularConstant="0.8" result="specLight">
+                                        <fePointLight x="20" y="15" z="25"/>
+                                    </feSpecularLighting>
+                                    <feComposite in="specLight" in2="SourceAlpha" operator="in" result="specClip"/>
+                                    <!-- Sombra tallada (hundimiento) -->
+                                    <feGaussianBlur in="SourceAlpha" stdDeviation="0.8" result="shadowBlur"/>
+                                    <feOffset in="shadowBlur" dx="0.6" dy="0.8" result="shadowOff"/>
+                                    <feFlood flood-color="#7e7299" flood-opacity="0.35" result="shadowColor"/>
+                                    <feComposite in="shadowColor" in2="shadowOff" operator="in" result="innerShadow"/>
+                                    <!-- Apilar: original + sombra tallada + brillo especular -->
+                                    <feMerge>
+                                        <feMergeNode in="innerShadow"/>
+                                        <feMergeNode in="SourceGraphic"/>
+                                        <feMergeNode in="specClip"/>
+                                    </feMerge>
+                                </filter>
+
+                                <clipPath id="sealClip">
+                                    <circle cx="32" cy="32" r="28.5"/>
+                                </clipPath>
+                            </defs>
+
+                            <!-- ========================================= -->
+                            <!--         CUERPO DEL SELLO DE CERA         -->
+                            <!-- ========================================= -->
+
+                            <!-- Borde irregular de cera (no es un círculo perfecto) -->
+                            <path d="M32,2.5 C38,2 44,3.5 49,7 C53,10 56.5,14 58.5,19
+                                     C60.5,24 61,28 61,32 C61,36 60.5,40 58.5,45
+                                     C56,49.5 53,53 49,56.5 C44.5,60 39,61.5 34,61.8
+                                     C29,62 24,61 19.5,58.5 C15,56 11,52.5 8,48
+                                     C5,43.5 3.5,39 3,34 C2.5,29 3,24 5,19.5
+                                     C7,15 10,11 14.5,7.5 C19,4 25,2.5 32,2.5 Z"
+                                  fill="url(#sealBase)" stroke="#9083ab" stroke-width="0.8" filter="url(#waxTexture)"/>
+
+                            <!-- Capa de profundidad interna (oscurece bordes bajos) -->
+                            <circle cx="32" cy="32" r="28" fill="url(#sealDepth)"/>
+
+                            <!-- Brillo especular superior -->
+                            <circle cx="32" cy="32" r="28" fill="url(#sealSpecular)"/>
+
+                            <!-- Textura de superficie de cera (granulado sutil) -->
+                            <circle cx="32" cy="32" r="27" fill="url(#rimLight)" filter="url(#embossFilter)" opacity="0.6"/>
+
+                            <!-- Borde interior escalonado (como cera presionada con sello) -->
+                            <circle cx="32" cy="32" r="25.5" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="0.5"/>
+                            <circle cx="32" cy="32" r="24" fill="none" stroke="rgba(140,125,170,0.2)" stroke-width="0.3"/>
+                            <!-- Segundo anillo con patrón decorativo -->
+                            <circle cx="32" cy="32" r="23" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.35" stroke-dasharray="1.2 2.4"/>
+
+                            <!-- ========================================= -->
+                            <!--     LIRIO TALLADO CON RELIEVE Y PERSPECTIVA    -->
+                            <!-- ========================================= -->
+                            <g clip-path="url(#sealClip)" filter="url(#carvedRelief)">
+
+                                <!-- === TALLO con grosor decreciente y curvatura natural === -->
+                                <path d="M32,42 C31,45.5 29.5,49 28,53" fill="none" stroke="rgba(255,255,255,0.38)" stroke-width="1.5" stroke-linecap="round"/>
+                                <path d="M31.6,42.5 C30.8,45.5 29.5,49 28.5,52" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="0.5" stroke-linecap="round"/>
+                                <!-- Línea de luz lateral en tallo -->
+                                <path d="M32.3,42.5 C31.3,46 30,49.5 28.8,52.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.3" stroke-linecap="round"/>
+
+                                <!-- Hoja principal izquierda (con nervadura y textura) -->
+                                <path d="M30,46 C26,44 22,44.5 22.5,47.5 C23,50 27,48.5 30,46 Z"
+                                      fill="rgba(255,255,255,0.15)" stroke="rgba(255,255,255,0.28)" stroke-width="0.5"/>
+                                <path d="M30,46 Q25,45.5 22.8,47" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="0.3"/>
+                                <path d="M27,46.2 Q25,46 23.5,47" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.2"/>
+                                <!-- Hoja opuesta más pequeña -->
+                                <path d="M31,44 C33.5,42.5 36,43 35.5,45 C34.8,46.5 32,45.5 31,44 Z"
+                                      fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.18)" stroke-width="0.4"/>
+                                <path d="M31.5,44.2 Q34,43.2 35.2,44.5" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.2"/>
+
+                                <!-- === CÁLIZ botánico (base de la flor) === -->
+                                <path d="M29,40 C30,41.5 32,42.5 34,41.5 C35.5,40.5 34.5,39 32.5,38.5 C30.5,38 29,39 29,40 Z"
+                                      fill="rgba(255,255,255,0.17)" stroke="rgba(255,255,255,0.25)" stroke-width="0.45"/>
+                                <!-- Sépalos sobresalientes más detallados -->
+                                <path d="M35,41 C37.5,42.5 39,41 37.5,39" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.4" stroke-linecap="round"/>
+                                <path d="M28.5,40 C26,41.5 24.5,40 26,38" fill="none" stroke="rgba(255,255,255,0.17)" stroke-width="0.4" stroke-linecap="round"/>
+                                <path d="M32,42 C32.5,43 32,43.5 31.5,43" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.25" stroke-linecap="round"/>
+
+                                <!-- === PÉTALOS TRASEROS (lejanos, profundidad atmosférica) === -->
+
+                                <!-- Pétalo trasero lejano derecha - más grande y curvado -->
+                                <path d="M32,36 C38,29 47,24 53,23 C55.5,23 56,25 54,27.5
+                                         C50,31 40,35 32,36 Z"
+                                      fill="rgba(255,255,255,0.09)" stroke="rgba(255,255,255,0.18)" stroke-width="0.5" opacity="0.75"/>
+                                <path d="M32,36 Q45,27 54,24" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.25"/>
+                                <path d="M44,29 Q48,27 52,25" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.2"/>
+
+                                <!-- Pétalo trasero lejano izquierda - simétrico amplio -->
+                                <path d="M32,36 C26,28 18,22 12,22 C9.5,22 9,24 11,26.5
+                                         C14,30 24,34 32,36 Z"
+                                      fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.16)" stroke-width="0.5" opacity="0.7"/>
+                                <path d="M32,36 Q20,26 11,23.5" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.25"/>
+
+                                <!-- Pétalo trasero arriba (parcialmente oculto, da profundidad) -->
+                                <path d="M32,36 C30,27 26,18 22,12 C20,9 20,8.5 22,10
+                                         C25,14 29,24 32,36 Z"
+                                      fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.14)" stroke-width="0.45" opacity="0.65"/>
+
+                                <!-- === INTERIOR DEL TUBO (garganta con degradado de profundidad) === -->
+                                <path d="M32,36 C27.5,33 24,31 22,30.5 C20,30 19.5,31.5 21,33.5
+                                         C23,36 27.5,37.5 32,36 Z"
+                                      fill="rgba(255,255,255,0.14)" stroke="rgba(255,255,255,0.1)" stroke-width="0.35" opacity="0.85"/>
+                                <path d="M32,36 C36.5,33 40,31 42,30.5 C44,30 44.5,31.5 43,33.5
+                                         C41,36 36.5,37.5 32,36 Z"
+                                      fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.08)" stroke-width="0.35" opacity="0.8"/>
+                                <!-- Profundidad interior oscura -->
+                                <ellipse cx="32" cy="34" rx="4" ry="1.8" fill="rgba(255,255,255,0.04)" opacity="0.6"/>
+
+                                <!-- === PÉTALOS FRONTALES (cercanos, detallados, con textura) === -->
+
+                                <!-- Pétalo frontal principal (curva dramática hacia arriba) -->
+                                <path d="M32,36 C34.5,26 36,16 34,9 C33,5.5 30.5,5 29,7.5
+                                         C26.5,12 27,24 30,33 C31,35 32,36 32,36 Z"
+                                      fill="rgba(255,255,255,0.32)" stroke="rgba(255,255,255,0.55)" stroke-width="0.8"/>
+                                <!-- Brillo especular satinado -->
+                                <path d="M31.5,30 C32.5,23 33.5,16 32.5,11"
+                                      fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="2" stroke-linecap="round" opacity="0.5"/>
+                                <!-- Nervadura central fina -->
+                                <path d="M32,36 C32.5,26.5 33,17 32,10" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="0.45" stroke-linecap="round"/>
+                                <!-- Nervaduras laterales naturalistas -->
+                                <path d="M32.5,28 Q30,27 28.5,27.5" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="0.25"/>
+                                <path d="M33,24 Q31,23 29,23.5" fill="none" stroke="rgba(255,255,255,0.09)" stroke-width="0.25"/>
+                                <path d="M33,20 Q31.5,19 29.5,19.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.25"/>
+                                <path d="M33.5,26 Q35,25.5 36,26" fill="none" stroke="rgba(255,255,255,0.07)" stroke-width="0.2"/>
+                                <path d="M33,22 Q34.5,21.5 35.5,22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="0.2"/>
+                                <!-- Punta recurvada elegante (enrollándose hacia fuera) -->
+                                <path d="M34,9 C35.5,6 37.5,5.5 38,7.5"
+                                      fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.55" stroke-linecap="round"/>
+                                <!-- Manchas del lirio (pecas botánicas) -->
+                                <circle cx="31.5" cy="30" r="0.55" fill="rgba(255,255,255,0.22)"/>
+                                <circle cx="30.5" cy="26" r="0.5" fill="rgba(255,255,255,0.18)"/>
+                                <circle cx="32.5" cy="24" r="0.45" fill="rgba(255,255,255,0.16)"/>
+                                <circle cx="30" cy="22" r="0.4" fill="rgba(255,255,255,0.14)"/>
+                                <circle cx="33" cy="20" r="0.4" fill="rgba(255,255,255,0.13)"/>
+                                <circle cx="31" cy="18" r="0.35" fill="rgba(255,255,255,0.12)"/>
+                                <circle cx="32" cy="15" r="0.3" fill="rgba(255,255,255,0.1)"/>
+                                <!-- Textura de pétalo (líneas micro) -->
+                                <path d="M31,32 L31.5,28" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="0.15"/>
+                                <path d="M33,31 L33.2,27" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="0.15"/>
+
+                                <!-- Pétalo frontal derecho (curvándose hacia espectador) -->
+                                <path d="M32,36 C37,32 43,29 49,28.5 C52,28.5 52.5,30.5 50,33
+                                         C47,36.5 38,38.5 32,36 Z"
+                                      fill="rgba(255,255,255,0.24)" stroke="rgba(255,255,255,0.44)" stroke-width="0.7"/>
+                                <path d="M32,36 Q43,30 50,29" fill="none" stroke="rgba(255,255,255,0.17)" stroke-width="0.35"/>
+                                <path d="M40,31.5 Q44,30 48,29.5" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="0.2"/>
+                                <!-- Punta recurvada -->
+                                <path d="M49,28.5 C51,26 52.5,26 52,28"
+                                      fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.5" stroke-linecap="round"/>
+                                <!-- Manchas -->
+                                <circle cx="40" cy="32" r="0.45" fill="rgba(255,255,255,0.17)"/>
+                                <circle cx="44" cy="31" r="0.4" fill="rgba(255,255,255,0.14)"/>
+                                <circle cx="37" cy="34" r="0.35" fill="rgba(255,255,255,0.12)"/>
+                                <circle cx="46" cy="30.5" r="0.3" fill="rgba(255,255,255,0.1)"/>
+
+                                <!-- Pétalo frontal izquierdo -->
+                                <path d="M32,36 C27,32 21,29 15,28.5 C12,28.5 11.5,30.5 14,33
+                                         C17,36.5 26,38.5 32,36 Z"
+                                      fill="rgba(255,255,255,0.2)" stroke="rgba(255,255,255,0.38)" stroke-width="0.65"/>
+                                <path d="M32,36 Q21,30 14,29" fill="none" stroke="rgba(255,255,255,0.14)" stroke-width="0.3"/>
+                                <path d="M15,28.5 C13,26 11.5,26 12,28"
+                                      fill="none" stroke="rgba(255,255,255,0.25)" stroke-width="0.45" stroke-linecap="round"/>
+                                <circle cx="24" cy="32" r="0.4" fill="rgba(255,255,255,0.15)"/>
+                                <circle cx="20" cy="31" r="0.35" fill="rgba(255,255,255,0.12)"/>
+
+                                <!-- === ESTAMBRES con perspectiva y polen dorado === -->
+                                <g stroke-linecap="round">
+                                    <!-- Estambre 1 — arriba-izq, curvatura natural -->
+                                    <path d="M32,36 C30,29 27,23 25.5,19" fill="none" stroke="rgba(255,255,255,0.32)" stroke-width="0.55"/>
+                                    <ellipse cx="25.5" cy="19" rx="1.8" ry="0.9" fill="rgba(255,255,255,0.42)" transform="rotate(-48,25.5,19)"/>
+                                    <ellipse cx="25.2" cy="18.5" rx="0.9" ry="0.4" fill="rgba(255,255,255,0.18)" transform="rotate(-48,25.2,18.5)"/>
+                                    <!-- Polen dorado -->
+                                    <circle cx="24.8" cy="18.2" r="0.25" fill="rgba(255,255,255,0.35)"/>
+                                    <circle cx="26" cy="19.5" r="0.2" fill="rgba(255,255,255,0.25)"/>
+
+                                    <!-- Estambre 2 — arriba-der -->
+                                    <path d="M32,36 C34.5,29 37,24 38.5,21" fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="0.55"/>
+                                    <ellipse cx="38.5" cy="21" rx="1.8" ry="0.9" fill="rgba(255,255,255,0.38)" transform="rotate(42,38.5,21)"/>
+                                    <ellipse cx="38.8" cy="20.5" rx="0.9" ry="0.4" fill="rgba(255,255,255,0.15)" transform="rotate(42,38.8,20.5)"/>
+                                    <circle cx="39.2" cy="20.2" r="0.22" fill="rgba(255,255,255,0.3)"/>
+
+                                    <!-- Estambre 3 — centro (escorzado, más corto) -->
+                                    <path d="M32,36 C32,30 31.2,24 30.8,20.5" fill="none" stroke="rgba(255,255,255,0.26)" stroke-width="0.5"/>
+                                    <ellipse cx="30.8" cy="20.5" rx="1.5" ry="0.7" fill="rgba(255,255,255,0.33)" transform="rotate(-8,30.8,20.5)"/>
+                                    <circle cx="30.5" cy="20" r="0.2" fill="rgba(255,255,255,0.28)"/>
+
+                                    <!-- Estambre 4 — lateral izq -->
+                                    <path d="M32,36 C28.5,33 25.5,30 23.5,27.5" fill="none" stroke="rgba(255,255,255,0.22)" stroke-width="0.45"/>
+                                    <ellipse cx="23.5" cy="27.5" rx="1.3" ry="0.65" fill="rgba(255,255,255,0.28)" transform="rotate(-62,23.5,27.5)"/>
+
+                                    <!-- Estambre 5 — lateral der -->
+                                    <path d="M32,36 C35.5,33 38.5,30 40.5,28" fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="0.45"/>
+                                    <ellipse cx="40.5" cy="28" rx="1.3" ry="0.65" fill="rgba(255,255,255,0.25)" transform="rotate(58,40.5,28)"/>
+
+                                    <!-- Estambre 6 — extra, da volumen -->
+                                    <path d="M32,36 C33,30 34,25 34.5,22" fill="none" stroke="rgba(255,255,255,0.18)" stroke-width="0.4"/>
+                                    <ellipse cx="34.5" cy="22" rx="1.2" ry="0.6" fill="rgba(255,255,255,0.24)" transform="rotate(15,34.5,22)"/>
+
+                                    <!-- Pistilo (el más largo, sobresale prominente) -->
+                                    <path d="M32,36 C31,27 28.5,19 27,13" fill="none" stroke="rgba(255,255,255,0.45)" stroke-width="0.75"/>
+                                    <circle cx="27" cy="13" r="1.6" fill="rgba(255,255,255,0.48)"/>
+                                    <circle cx="27" cy="13" r="0.9" fill="rgba(255,255,255,0.25)"/>
+                                    <!-- Highlight del estigma trilobado -->
+                                    <circle cx="26.5" cy="12.3" r="0.35" fill="rgba(255,255,255,0.35)"/>
+                                    <circle cx="27.5" cy="12.5" r="0.25" fill="rgba(255,255,255,0.25)"/>
+                                    <circle cx="26.8" cy="13.2" r="0.2" fill="rgba(255,255,255,0.2)"/>
+                                </g>
+                            </g>
+
+                            <!-- Borde decorativo exterior — muescas irregulares de cera -->
+                            <circle cx="32" cy="32" r="29" fill="none" stroke="#7e7299" stroke-width="0.35" stroke-dasharray="2 1.5 3 1" opacity="0.4"/>
+                            <!-- Reflejo sutil del borde superior -->
+                            <path d="M12,12 C18,5 28,2.5 32,2.5 C38,2.5 46,5 52,12"
+                                  fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="1.5" stroke-linecap="round"/>
+                        </svg>
+                    </div>
+                </div>
+                <div class="envelope-flap" id="envelopeFlap"></div>
+            </div>
+
+            <!-- Carta -->
+            <div class="letter" id="letter">
+                <!-- ===== LIRIO CENTRAL COMO FONDO GRANDE DIFUMINADO ===== -->
+                <div class="lily-background" aria-hidden="true">
+                    <img src="lirio-fondo.jpg" alt="" class="lily-bg-svg">
+                </div>
+
+                <!-- Decoraciones de esquinas con lirio -->
+                <div class="corner corner-tl" data-parallax="0.06">
+                    <img src="lirio.svg" alt="" class="lily-img" aria-hidden="true">
+                </div>
+                <div class="corner corner-tr" data-parallax="0.06">
+                    <img src="lirio.svg" alt="" class="lily-img" aria-hidden="true">
+                </div>
+                <div class="corner corner-bl" data-parallax="0.04">
+                    <img src="lirio.svg" alt="" class="lily-img" aria-hidden="true">
+                </div>
+                <div class="corner corner-br" data-parallax="0.04">
+                    <img src="lirio.svg" alt="" class="lily-img" aria-hidden="true">
+                </div>
+
+                <!-- Bordes decorativos -->
+                <div class="letter-frame">
+                    <div class="frame-line frame-top"></div>
+                    <div class="frame-line frame-bottom"></div>
+                    <div class="frame-line frame-left"></div>
+                    <div class="frame-line frame-right"></div>
+                </div>
+
+                <!-- Botón para cerrar la carta -->
+                <button class="letter-close" id="letterClose" aria-label="Cerrar carta">
+                    <i data-lucide="x"></i>
+                </button>
+
+                <!-- Contenido de la carta -->
+                <div class="letter-body">
+                    <div class="letter-header">
+                        <h1 class="title">Para ti</h1>
+                        <div class="subtitle">San Valentín 2026</div>
+                        <div class="divider">
+                            <span></span>
+                            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg>
+                            <span></span>
+                        </div>
+                    </div>
+
+                    <div class="letter-scroll" id="letterScroll">
+                        <div class="letter-text" id="letterText">
+                            <p>Es interesante que todo este tiempo que nos hemos visualizado a futuro, de cierto modo, tú no estás cerca del mío; ambos nos vemos viviendo una vida lejos del otro, y ahora estamos a tres ciclos de que eso suceda. Te veo lejos de mí porque sé que eres una persona llena de sueños y metas, y me encantaría verte recorrer el mundo tal como me lo has contado. Espero que de verdad te puedas ir para la Facio, siento que va a marcar un antes y un después en tu vida.</p>
+
+                            <p>Perdón por tanta melancolía anticipada, pero como lo dije antes, eres un momento efímero en mi vida, y no solo quiero pensar las cosas y ser presa de mis recuerdos y mis pensamientos, ya que hubo cosas que me hubieran gustado decir o hacer, pero por estar esperando el momento indicado nunca tuvieron lugar.</p>
+
+                            <p class="highlight">Te dejo este mini carrusel de fotos de algunos de los momentos hermosos e increíbles que hemos vivido, al ver las fotos yo, he visto un antes y un después en mi vida, has marcado un precedente, he vuelto a soñar, a sonreír, he vuelto a ser yo.</p>
+
+                            <p class="highlight">¡Qué gran experiencia resultaste ser, mágica como tú!</p>
+
+                            <p>Este será un mini álbum que podrás abrir y ver donde quiera que vayas, y recordar que hay alguien que te lleva en el fondo de su ser, que lleva tatuadas todas las vivencias y recuerdos mágicos en su alma.</p>
+
+                            <p class="highlight">Tú jamás serás reemplazada, no hay ser que pueda llenar el vacío de tu partida, yo siempre estaré y te estaré esperando.</p>
+
+                            <p>Gracias por tanto señorita Ferreto…</p>
+
+                            <p>Espero no te quede ninguna duda de mis palabras, siento que un te quiero no basta para expresar tanto.</p>
+
+                            <p>Al final seremos como el zorro y el principito, te regalo estos fragmentos del cuento, este será mi gran obsequio para ti, si algún día estás lejos y vuelves a leer las páginas que hago tuyas, quiero que me recuerdes y espero se escape una sutil sonrisa:</p>
+                        </div>
+
+                        <!-- Fragmentos de El Principito -->
+                        <div class="principito-quotes" id="principitoQuotes">
+                            <div class="quote-section">
+                                <span class="quote-number">I)</span>
+                                <blockquote>
+                                    <p>—Ven a jugar conmigo —le propuso el principito—. ¡Estoy tan triste!</p>
+                                    <p>—No puedo jugar contigo —dijo el zorro—. No estoy domesticado.</p>
+                                    <p>—¡Ah! Perdón —dijo el principito.</p>
+                                    <p>Pero después de una reflexión añadió:</p>
+                                    <p>—¿Qué significa «domesticar»?</p>
+                                    <p>—No eres de aquí —dijo el zorro—. ¿Qué buscas?</p>
+                                    <p>—Busco a los hombres —dijo el principito—. ¿Qué significa «domesticar»?</p>
+                                    <p>—Los hombres —dijo el zorro— tienen fusiles y cazan. ¡Es muy molesto! También crían gallinas. Es su único interés. ¿Buscas gallinas?</p>
+                                    <p>—No —dijo el principito—. Busco amigos. ¿Qué significa «domesticar»?</p>
+                                    <p>—Es una cosa demasiado olvidada —dijo el zorro—. Significa «crear lazos».</p>
+                                    <p>—¿Crear lazos?</p>
+                                    <p>—Eso mismo —dijo el zorro—. Todavía no eres para mí más que un muchachito semejante a otros cien mil muchachitos. Y no te necesito. Y tú tampoco me necesitas. No soy para ti más que un zorro semejante a cien mil zorros. Pero si me domésticas, entonces tendremos necesidad el uno del otro. Tú serás para mí único en el mundo, yo seré para ti único en el mundo...</p>
+                                </blockquote>
+                            </div>
+
+                            <div class="quote-section">
+                                <span class="quote-number">II)</span>
+                                <blockquote>
+                                    <p>—Mi vida es monótona. Yo cazo gallinas, los hombres me cazan. Todas las gallinas se parecen y todos los hombres se parecen. Por lo tanto, me aburro un poco. Pero si me domésticas, mi vida se llenará de sol. Conoceré un ruido de pasos que será diferente de todos los otros. Los otros pasos me hacen esconder bajo la tierra. Los tuyos me llamarán fuera de la madriguera como una música.</p>
+                                    <p>(...)</p>
+                                    <p>—Hubiera sido mejor venir a la misma hora —dijo el zorro—. Si vienes, por ejemplo, a las cuatro de la tarde, desde las tres yo comenzaría a ser dichoso. Cuanto más avance la hora, más dichoso me sentiré. Al llegar las cuatro me sentiré agitado e inquieto; así descubriré el precio de la felicidad. ¡Pero si vienes a cualquier hora, nunca sabré a qué hora preparar mi corazón... ¡Los ritos son necesarios!</p>
+                                </blockquote>
+                            </div>
+
+                            <div class="quote-section">
+                                <span class="quote-number">III)</span>
+                                <blockquote>
+                                    <p>—Ahora te vas —dijo el zorro—. Lloraré por ti.</p>
+                                    <p>—Tuya es la culpa —dijo el principito—. No deseaba hacerte mal, pero tú quisiste que te domesticara.</p>
+                                    <p>—Sí, es cierto —dijo el zorro.</p>
+                                    <p>—¡Y vas a llorar! —dijo el principito.</p>
+                                    <p>—Sí, es cierto.</p>
+                                    <p>—¡Entonces no ganas nada!</p>
+                                    <p>—Gano —dijo el zorro—, por el color del trigo. (…)</p>
+                                    <p>—Anda a ver las rosas. Comprenderás que la tuya es única en el mundo.</p>
+                                    <p class="quote-narration">El Principito va a ver el jardín de rosas y luego vuelve con el zorro para despedirse.</p>
+                                    <p>—Adiós —dijo el principito.</p>
+                                    <p>—Adiós —dijo el zorro—. He aquí mi secreto. Es muy simple: no se ve bien sino con el corazón. Lo esencial es invisible a los ojos.</p>
+                                    <p>—Lo esencial es invisible a los ojos —repitió el principito para acordarse.</p>
+                                    <p>—El tiempo que perdiste por tu rosa hace que tu rosa sea tan importante.</p>
+                                    <p>—El tiempo que perdí por mi rosa... —repitió el principito para acordarse.</p>
+                                    <p>—Los hombres han olvidado esta verdad —dijo el zorro—. Pero tú no debes olvidarla. Eres responsable para siempre de lo que has domesticado. Eres responsable de tu rosa.</p>
+                                    <p>—Soy responsable de mi rosa... —repitió el principito para acordarse.</p>
+                                </blockquote>
+                            </div>
+                        </div>
+
+                        <!-- Texto final -->
+                        <div class="letter-closing" id="letterClosing">
+                            <p>Llegaste en el momento justo a mi vida, gracias por salvarme del abismo al que estaba cayendo, gracias por ser tú.</p>
+                            <p class="highlight">Al final somos dos seres dañados, gracias a ti me he ido reconstruyendo poco a poco y en señal de agradecimiento diré: "Dime donde te duele para amarte más ahí".</p>
+                        </div>
+
+                        <!-- Galería de fotos -->
+                        <div class="photo-gallery" id="photoGallery">
+                            <div class="gallery-track" id="galleryTrack">
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-1.jpeg" alt="Foto 1"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-2.jpeg" alt="Foto 2"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-3.jpeg" alt="Foto 3"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-4.jpeg" alt="Foto 4"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-5.jpeg" alt="Foto 5"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-6.jpeg" alt="Foto 6"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-7.jpeg" alt="Foto 7"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-8.jpeg" alt="Foto 8"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-9.jpeg" alt="Foto 9"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-10.jpeg" alt="Foto 10"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-11.jpeg" alt="Foto 11"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-12.jpeg" alt="Foto 12"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-13.jpeg" alt="Foto 13"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-14.jpeg" alt="Foto 14"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-15.jpeg" alt="Foto 15"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-16.jpeg" alt="Foto 16"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-17.jpeg" alt="Foto 17"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-18.jpeg" alt="Foto 18"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-19.jpeg" alt="Foto 19"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-20.jpg" alt="Foto 20"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-21.jpg" alt="Foto 21"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-22.jpg" alt="Foto 22"></div>
+                                </div>
+                                <div class="gallery-slide">
+                                    <div class="photo-placeholder"><img src="fotos/foto-23.jpg" alt="Foto 23"></div>
+                                </div>
+                            </div>
+                            <div class="gallery-nav">
+                                <button class="gallery-btn gallery-prev" id="galleryPrev" aria-label="Anterior">
+                                    <i data-lucide="chevron-left"></i>
+                                </button>
+                                <div class="gallery-dots" id="galleryDots"></div>
+                                <button class="gallery-btn gallery-next" id="galleryNext" aria-label="Siguiente">
+                                    <i data-lucide="chevron-right"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <!-- Firma -->
+                        <div class="signature-container" id="signatureContainer">
+                            <img src="firma.jpg" alt="Firma" class="signature-img" id="signatureImg">
+                        </div>
+                    </div>
+
+                    <!-- Indicador de scroll -->
+                    <div class="scroll-hint" id="scrollHint">
+                        <i data-lucide="chevrons-down" class="scroll-hint-icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal" id="modal">
+            <button class="modal-close" id="modalClose">
+                <i data-lucide="x"></i>
+            </button>
+            <div class="modal-header">
+                <div class="modal-ornament">
+                    <svg viewBox="0 0 100 72" class="lily-modal-svg" aria-hidden="true">
+                        <defs>
+                            <linearGradient id="mPetalBack" x1="50%" y1="100%" x2="50%" y2="0%">
+                                <stop offset="0%" stop-color="#d8cceb" stop-opacity="0.18"/>
+                                <stop offset="100%" stop-color="#c4b0db" stop-opacity="0.06"/>
+                            </linearGradient>
+                            <linearGradient id="mPetalFront" x1="50%" y1="100%" x2="50%" y2="0%">
+                                <stop offset="0%" stop-color="#f0eaf8" stop-opacity="0.4"/>
+                                <stop offset="50%" stop-color="#d4c4e8" stop-opacity="0.25"/>
+                                <stop offset="100%" stop-color="#b8a4d3" stop-opacity="0.12"/>
+                            </linearGradient>
+                            <linearGradient id="mPetalMid" x1="50%" y1="100%" x2="50%" y2="0%">
+                                <stop offset="0%" stop-color="#e8e0f2" stop-opacity="0.3"/>
+                                <stop offset="100%" stop-color="#c4b0db" stop-opacity="0.08"/>
+                            </linearGradient>
+
+                        </defs>
+                        <!-- ===== PÉTALOS TRASEROS ANCHOS ===== -->
+                        <!-- Trasero superior-izquierdo -->
+                        <path d="M50,34 C42,26 28,14 20,6 C16,2 18,-2 24,-2 C30,-2 38,4 42,14 C45,22 48,28 50,34 Z"
+                              fill="url(#mPetalBack)" stroke="#c4b0db" stroke-width="0.65" opacity="0.48"/>
+                        <path d="M50,34 Q34,18 22,4" fill="none" stroke="#c4b0db" stroke-width="0.3" opacity="0.15"/>
+                        <path d="M42,22 Q34,14 26,8" fill="none" stroke="#c4b0db" stroke-width="0.2" opacity="0.1"/>
+                        <path d="M20,6 C16,2 14,4 18,8" fill="none" stroke="#b8a4d3" stroke-width="0.45" opacity="0.28" stroke-linecap="round"/>
+
+                        <!-- Trasero superior-derecho -->
+                        <path d="M50,34 C58,26 72,14 80,6 C84,2 82,-2 76,-2 C70,-2 62,4 58,14 C55,22 52,28 50,34 Z"
+                              fill="url(#mPetalBack)" stroke="#c4b0db" stroke-width="0.65" opacity="0.43"/>
+                        <path d="M50,34 Q66,18 78,4" fill="none" stroke="#c4b0db" stroke-width="0.3" opacity="0.14"/>
+                        <path d="M58,22 Q66,14 74,8" fill="none" stroke="#c4b0db" stroke-width="0.2" opacity="0.09"/>
+                        <path d="M80,6 C84,2 86,4 82,8" fill="none" stroke="#b8a4d3" stroke-width="0.45" opacity="0.25" stroke-linecap="round"/>
+
+                        <!-- ===== GARGANTA INTERIOR ===== -->
+                        <path d="M50,34 C44,31 36,30 33,32 C30,33 32,36 36,37 C40,37 46,36 50,34 Z"
+                              fill="#d4c4e8" fill-opacity="0.08" stroke="#c9b8de" stroke-width="0.3" opacity="0.35"/>
+                        <path d="M50,34 C56,31 64,30 67,32 C70,33 68,36 64,37 C60,37 54,36 50,34 Z"
+                              fill="#d4c4e8" fill-opacity="0.06" stroke="#c9b8de" stroke-width="0.3" opacity="0.3"/>
+                        <!-- Profundidad interior -->
+                        <ellipse cx="50" cy="34" rx="4" ry="1.8" fill="#b8a4d3" opacity="0.05"/>
+
+                        <!-- ===== PÉTALOS FRONTALES ANCHOS ===== -->
+                        <!-- Principal arriba (el más ancho) -->
+                        <path d="M50,34 C42,26 32,14 30,4
+                                 C28,-2 34,-6 44,-6
+                                 Q50,-6 56,-6
+                                 C66,-6 72,-2 70,4
+                                 C68,14 58,26 50,34 Z"
+                              fill="url(#mPetalFront)" stroke="#b8a4d3" stroke-width="0.95" opacity="0.82"/>
+                        <!-- Brillo satinado -->
+                        <path d="M46,20 C46,12 46,4 46,-2" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.5" stroke-linecap="round"/>
+                        <path d="M54,20 C54,12 54,4 54,-2" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" stroke-linecap="round"/>
+                        <!-- Puntas recurvadas -->
+                        <path d="M44,-6 C40,-10 38,-8 40,-4" fill="none" stroke="#b8a4d3" stroke-width="0.55" opacity="0.32" stroke-linecap="round"/>
+                        <path d="M56,-6 C60,-10 62,-8 60,-4" fill="none" stroke="#b8a4d3" stroke-width="0.55" opacity="0.3" stroke-linecap="round"/>
+                        <!-- Nervadura central -->
+                        <path d="M50,34 Q50,18 50,0" fill="none" stroke="#b8a4d3" stroke-width="0.5" opacity="0.24"/>
+                        <!-- Nervaduras laterales izquierdas -->
+                        <path d="M50,28 Q44,26 40,24" fill="none" stroke="#c4b0db" stroke-width="0.25" opacity="0.17"/>
+                        <path d="M50,24 Q44,22 40,20" fill="none" stroke="#c4b0db" stroke-width="0.25" opacity="0.15"/>
+                        <path d="M50,18 Q46,16 42,16" fill="none" stroke="#c4b0db" stroke-width="0.22" opacity="0.13"/>
+                        <path d="M50,12 Q46,10 42,10" fill="none" stroke="#c4b0db" stroke-width="0.2" opacity="0.1"/>
+                        <!-- Nervaduras laterales derechas -->
+                        <path d="M50,28 Q56,26 60,24" fill="none" stroke="#c4b0db" stroke-width="0.25" opacity="0.16"/>
+                        <path d="M50,24 Q56,22 60,20" fill="none" stroke="#c4b0db" stroke-width="0.22" opacity="0.14"/>
+                        <path d="M50,18 Q54,16 58,16" fill="none" stroke="#c4b0db" stroke-width="0.2" opacity="0.12"/>
+                        <path d="M50,12 Q54,10 58,10" fill="none" stroke="#c4b0db" stroke-width="0.18" opacity="0.09"/>
+                        <!-- Manchas botánicas con distribución natural -->
+                        <circle cx="48" cy="24" r="1" fill="#9083ab" opacity="0.34"/>
+                        <circle cx="52" cy="18" r="0.9" fill="#9083ab" opacity="0.3"/>
+                        <circle cx="47" cy="16" r="0.8" fill="#9083ab" opacity="0.27"/>
+                        <circle cx="53" cy="12" r="0.7" fill="#9083ab" opacity="0.24"/>
+                        <circle cx="50" cy="28" r="0.8" fill="#9083ab" opacity="0.32"/>
+                        <circle cx="46" cy="20" r="0.7" fill="#9083ab" opacity="0.22"/>
+                        <circle cx="54" cy="22" r="0.65" fill="#9083ab" opacity="0.2"/>
+                        <circle cx="49" cy="10" r="0.55" fill="#9083ab" opacity="0.18"/>
+                        <circle cx="51" cy="6" r="0.5" fill="#9083ab" opacity="0.15"/>
+                        <ellipse cx="47" cy="22" rx="0.4" ry="0.7" fill="#9083ab" opacity="0.16" transform="rotate(-12,47,22)"/>
+                        <ellipse cx="53" cy="16" rx="0.4" ry="0.65" fill="#9083ab" opacity="0.14" transform="rotate(10,53,16)"/>
+
+                        <!-- Derecho ancho -->
+                        <path d="M50,34 C58,30 70,26 82,24
+                                 C90,22 94,28 92,34
+                                 Q90,40 82,42
+                                 C68,44 56,40 50,34 Z"
+                              fill="url(#mPetalMid)" stroke="#b8a4d3" stroke-width="0.85" opacity="0.68"/>
+                        <!-- Nervadura central -->
+                        <path d="M50,34 Q72,28 86,26" fill="none" stroke="#b8a4d3" stroke-width="0.38" opacity="0.22"/>
+                        <!-- Nervaduras secundarias -->
+                        <path d="M62,32 Q70,30 78,28" fill="none" stroke="#c4b0db" stroke-width="0.22" opacity="0.13"/>
+                        <path d="M58,34 Q64,32 72,30" fill="none" stroke="#c4b0db" stroke-width="0.2" opacity="0.1"/>
+                        <!-- Punta recurvada -->
+                        <path d="M92,34 C96,30 96,26 92,24" fill="none" stroke="#b8a4d3" stroke-width="0.55" opacity="0.27" stroke-linecap="round"/>
+                        <!-- Micro-textura satinada -->
+                        <path d="M64,30 Q76,28 86,26" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" stroke-linecap="round"/>
+                        <!-- Manchas -->
+                        <circle cx="66" cy="30" r="0.8" fill="#9083ab" opacity="0.24"/>
+                        <circle cx="74" cy="28" r="0.7" fill="#9083ab" opacity="0.22"/>
+                        <circle cx="80" cy="30" r="0.55" fill="#9083ab" opacity="0.18"/>
+                        <circle cx="70" cy="32" r="0.5" fill="#9083ab" opacity="0.16"/>
+                        <ellipse cx="72" cy="29" rx="0.4" ry="0.6" fill="#9083ab" opacity="0.14" transform="rotate(18,72,29)"/>
+
+                        <!-- Izquierdo ancho -->
+                        <path d="M50,34 C42,30 30,26 18,24
+                                 C10,22 6,28 8,34
+                                 Q10,40 18,42
+                                 C32,44 44,40 50,34 Z"
+                              fill="url(#mPetalMid)" stroke="#b8a4d3" stroke-width="0.85" opacity="0.63"/>
+                        <!-- Nervadura central -->
+                        <path d="M50,34 Q28,28 14,26" fill="none" stroke="#b8a4d3" stroke-width="0.38" opacity="0.2"/>
+                        <!-- Nervaduras secundarias -->
+                        <path d="M38,32 Q30,30 22,28" fill="none" stroke="#c4b0db" stroke-width="0.22" opacity="0.12"/>
+                        <path d="M42,34 Q36,32 28,30" fill="none" stroke="#c4b0db" stroke-width="0.2" opacity="0.1"/>
+                        <!-- Punta recurvada -->
+                        <path d="M8,34 C4,30 4,26 8,24" fill="none" stroke="#b8a4d3" stroke-width="0.55" opacity="0.24" stroke-linecap="round"/>
+                        <!-- Micro-textura satinada -->
+                        <path d="M36,30 Q24,28 14,26" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1.5" stroke-linecap="round"/>
+                        <!-- Manchas -->
+                        <circle cx="34" cy="30" r="0.7" fill="#9083ab" opacity="0.22"/>
+                        <circle cx="26" cy="28" r="0.6" fill="#9083ab" opacity="0.2"/>
+                        <circle cx="20" cy="30" r="0.5" fill="#9083ab" opacity="0.16"/>
+                        <circle cx="30" cy="32" r="0.45" fill="#9083ab" opacity="0.15"/>
+                        <ellipse cx="28" cy="29" rx="0.4" ry="0.6" fill="#9083ab" opacity="0.13" transform="rotate(-15,28,29)"/>
+
+                        <!-- ===== ESTAMBRES CON ANTERAS ÁMBAR Y POLEN ===== -->
+                        <g stroke-linecap="round">
+                            <!-- Estambre 1 izquierdo -->
+                            <path d="M50,34 C46,24 40,14 38,8" fill="none" stroke="#c9b8de" stroke-width="0.7" opacity="0.47"/>
+                            <ellipse cx="38" cy="8" rx="2.7" ry="1.4" fill="#c4956a" opacity="0.52" transform="rotate(-40,38,8)"/>
+                            <ellipse cx="37.6" cy="7.3" rx="1.4" ry="0.55" fill="#dab88a" opacity="0.3" transform="rotate(-40,37.6,7.3)"/>
+                            <path d="M36.5,6.5 Q38,8 39.5,9.5" fill="none" stroke="#8b6d4a" stroke-width="0.2" opacity="0.15"/>
+                            <circle cx="36.8" cy="6.3" r="0.35" fill="#e8c878" opacity="0.38"/>
+                            <circle cx="39.2" cy="9.2" r="0.25" fill="#e8c878" opacity="0.28"/>
+
+                            <!-- Estambre 2 derecho -->
+                            <path d="M50,34 C54,24 60,16 62,10" fill="none" stroke="#c9b8de" stroke-width="0.7" opacity="0.44"/>
+                            <ellipse cx="62" cy="10" rx="2.7" ry="1.4" fill="#c4956a" opacity="0.5" transform="rotate(35,62,10)"/>
+                            <ellipse cx="62.4" cy="9.3" rx="1.4" ry="0.55" fill="#dab88a" opacity="0.28" transform="rotate(35,62.4,9.3)"/>
+                            <path d="M61,8.5 Q62,10 63,11.5" fill="none" stroke="#8b6d4a" stroke-width="0.2" opacity="0.14"/>
+                            <circle cx="61.2" cy="8.3" r="0.3" fill="#e8c878" opacity="0.35"/>
+
+                            <!-- Estambre 3 centro -->
+                            <path d="M50,34 C50,24 48,14 46,8" fill="none" stroke="#c9b8de" stroke-width="0.6" opacity="0.4"/>
+                            <ellipse cx="46" cy="8" rx="2.2" ry="1.1" fill="#c4956a" opacity="0.45" transform="rotate(-5,46,8)"/>
+                            <ellipse cx="45.8" cy="7.3" rx="1.1" ry="0.45" fill="#dab88a" opacity="0.22" transform="rotate(-5,45.8,7.3)"/>
+                            <circle cx="45.5" cy="7" r="0.25" fill="#e8c878" opacity="0.3"/>
+
+                            <!-- Estambre 4 extra -->
+                            <path d="M50,34 C53,24 56,16 56,10" fill="none" stroke="#c9b8de" stroke-width="0.5" opacity="0.32"/>
+                            <ellipse cx="56" cy="10" rx="1.8" ry="0.9" fill="#c4956a" opacity="0.38" transform="rotate(10,56,10)"/>
+
+                            <!-- Pistilo central con estigma trilobado -->
+                            <path d="M50,34 C48,22 44,12 42,4" fill="none" stroke="#b8a4d3" stroke-width="0.85" opacity="0.5"/>
+                            <circle cx="42" cy="4" r="2.2" fill="#b8a4d3" opacity="0.45"/>
+                            <circle cx="42" cy="4" r="1.1" fill="#9083ab" opacity="0.3"/>
+                            <circle cx="41.4" cy="3" r="0.4" fill="#ede3f7" opacity="0.35"/>
+                            <circle cx="42.6" cy="3.2" r="0.35" fill="#ede3f7" opacity="0.3"/>
+                            <circle cx="42" cy="4.6" r="0.3" fill="#ede3f7" opacity="0.25"/>
+                            <circle cx="41.5" cy="5.5" r="0.15" fill="#ddd0ee" opacity="0.2"/>
+                        </g>
+
+                        <!-- ===== EFECTOS DE PROFUNDIDAD ===== -->
+                        <!-- Capa translúcida sobre garganta -->
+                        <ellipse cx="50" cy="33" rx="8" ry="3.5" fill="rgba(255,255,255,0.06)" opacity="0.4"/>
+
+                        <!-- Gotas de rocío -->
+                        <g>
+                            <circle cx="46" cy="18" r="0.9" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.06)" stroke-width="0.2"/>
+                            <circle cx="45.7" cy="17.5" r="0.25" fill="rgba(255,255,255,0.25)"/>
+                            <circle cx="56" cy="14" r="0.7" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.05)" stroke-width="0.18"/>
+                            <circle cx="55.7" cy="13.6" r="0.18" fill="rgba(255,255,255,0.22)"/>
+                            <circle cx="72" cy="28" r="0.6" fill="rgba(255,255,255,0.08)"/>
+                            <circle cx="71.8" cy="27.7" r="0.15" fill="rgba(255,255,255,0.18)"/>
+                        </g>
+
+                        <!-- Manchas alargadas tipo pincelada -->
+                        <g opacity="0.16">
+                            <ellipse cx="48" cy="20" rx="0.4" ry="1.6" fill="#9083ab" transform="rotate(-10,48,20)"/>
+                            <ellipse cx="53" cy="14" rx="0.35" ry="1.3" fill="#9083ab" transform="rotate(8,53,14)"/>
+                            <ellipse cx="68" cy="30" rx="0.35" ry="1.2" fill="#9083ab" transform="rotate(22,68,30)"/>
+                            <ellipse cx="32" cy="30" rx="0.35" ry="1.1" fill="#9083ab" transform="rotate(-18,32,30)"/>
+                        </g>
+
+                        <!-- Nube de polen difuso -->
+                        <g opacity="0.09">
+                            <circle cx="38" cy="7" r="2" fill="#e8c878" style="filter:blur(0.5px)"/>
+                            <circle cx="62" cy="9" r="1.8" fill="#e8c878" style="filter:blur(0.5px)"/>
+                            <circle cx="46" cy="7" r="1.5" fill="#e8c878" style="filter:blur(0.4px)"/>
+                            <circle cx="42" cy="4" r="1.2" fill="#e8c878" style="filter:blur(0.3px)"/>
+                        </g>
+
+                        <!-- Bordes ondulados orgánicos -->
+                        <g opacity="0.18" fill="none" stroke="#c4b0db" stroke-width="0.25" stroke-linecap="round">
+                            <path d="M44,-6 C42,-5 40,-6.5 38,-5"/>
+                            <path d="M56,-6 C58,-5 60,-6.5 62,-5"/>
+                            <path d="M92,34 C93,36 92,38 90,39"/>
+                            <path d="M8,34 C7,36 8,38 10,39"/>
+                        </g>
+
+                        <!-- ===== SOMBRA PROYECTADA ===== -->
+                        <ellipse cx="50" cy="60" rx="12" ry="2.5" fill="#c4b0db" opacity="0.04"/>
+
+                    </svg>
+                </div>
+                <h2>Lo que admiro de ti</h2>
+                <div class="modal-divider">
+                    <span></span><span></span>
+                </div>
+            </div>
+            <div class="reasons" id="reasons">
+                <div class="reason" data-index="0">
+                    <div class="reason-icon"><i data-lucide="sparkles"></i></div>
+                    <div class="reason-content">
+                        <h3>Tu elegancia natural</h3>
+                        <p>La forma en que te mueves por el mundo con gracia y distinción</p>
+                    </div>
+                </div>
+                <div class="reason" data-index="1">
+                    <div class="reason-icon"><i data-lucide="brain"></i></div>
+                    <div class="reason-content">
+                        <h3>Tu inteligencia</h3>
+                        <p>Cada conversación contigo me hace ver las cosas de manera diferente</p>
+                    </div>
+                </div>
+                <div class="reason" data-index="2">
+                    <div class="reason-icon"><i data-lucide="heart-handshake"></i></div>
+                    <div class="reason-content">
+                        <h3>Tu bondad genuina</h3>
+                        <p>La calidez con la que tratas a quienes te rodean</p>
+                    </div>
+                </div>
+                <div class="reason" data-index="3">
+                    <div class="reason-icon"><i data-lucide="shield"></i></div>
+                    <div class="reason-content">
+                        <h3>Tu fortaleza silenciosa</h3>
+                        <p>La manera en que enfrentas los desafíos con dignidad</p>
+                    </div>
+                </div>
+                <div class="reason" data-index="4">
+                    <div class="reason-icon"><i data-lucide="fingerprint"></i></div>
+                    <div class="reason-content">
+                        <h3>Tu esencia única</h3>
+                        <p>Simplemente por ser tú, auténtica e incomparable</p>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <div class="final-message">Eres extraordinaria ❦</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Control de música -->
+    <button class="music-btn" id="musicBtn" aria-label="Música">
+        <i data-lucide="music" id="musicIcon"></i>
+        <div class="music-rings">
+            <span></span><span></span><span></span>
+        </div>
+    </button>
+
+    <!-- Audio gestionado por Howler.js -->
+
+    <!-- SVG Definitions (reusable lily corners with gradients) -->
+    <svg style="position:absolute;width:0;height:0;overflow:hidden" aria-hidden="true">
+        <defs>
+            <!-- Gradientes reutilizables -->
+            <linearGradient id="petalGrad1" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stop-color="#e2d5f0" stop-opacity="0.18"/>
+                <stop offset="50%" stop-color="#d4c4e8" stop-opacity="0.10"/>
+                <stop offset="100%" stop-color="#c4b0db" stop-opacity="0.05"/>
+            </linearGradient>
+            <linearGradient id="petalGrad2" x1="0%" y1="100%" x2="100%" y2="0%">
+                <stop offset="0%" stop-color="#ede3f7" stop-opacity="0.15"/>
+                <stop offset="100%" stop-color="#d4c4e8" stop-opacity="0.04"/>
+            </linearGradient>
+
+
+            <!-- Filtro de suavizado -->
+            <filter id="softGlow" x="-20%" y="-20%" width="140%" height="140%">
+                <feGaussianBlur in="SourceGraphic" stdDeviation="0.4"/>
+            </filter>
+
+            <symbol id="lilyCorner" viewBox="0 0 150 150">
+                <!-- ===== FLOR PRINCIPAL - LIRIO ABIERTO ===== -->
+
+                <!-- PÉTALO 1 Superior izquierdo — ancho, curvado -->
+                <path d="M35,72 C26,59 13,38 7,22 C3,12 3,4 10,0
+                         C17,-4 26,4 30,18 C34,32 35,52 35,60 Z"
+                      fill="url(#petalGrad1)" stroke="#b8a4d3" stroke-width="1.15" stroke-linecap="round" opacity="0.75"/>
+                <path d="M35,72 Q19,44 9,16" fill="none" stroke="#b8a4d3" stroke-width="0.55" opacity="0.3"/>
+                <path d="M28,48 Q21,41 15,38" fill="none" stroke="#c4b0db" stroke-width="0.3" opacity="0.18"/>
+                <path d="M22,36 Q17,31 11,28" fill="none" stroke="#c4b0db" stroke-width="0.3" opacity="0.15"/>
+                <path d="M18,28 Q14,24 10,22" fill="none" stroke="#c4b0db" stroke-width="0.25" opacity="0.12"/>
+                <path d="M30,54 Q26,50 22,48" fill="none" stroke="#c4b0db" stroke-width="0.25" opacity="0.13"/>
+                <path d="M10,0 C6,-4 3,-2 7,5" fill="none" stroke="#b8a4d3" stroke-width="0.8" opacity="0.42" stroke-linecap="round"/>
+                <path d="M30,56 C26,44 20,30 14,18" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="3" stroke-linecap="round" opacity="0.4"/>
+
+                <!-- PÉTALO 2 Superior derecho — amplio -->
+                <path d="M35,72 C43,55 54,32 62,16 C68,4 75,-2 79,2
+                         C83,6 76,20 67,36 C56,54 44,68 35,72 Z"
+                      fill="url(#petalGrad2)" stroke="#b8a4d3" stroke-width="1.15" stroke-linecap="round" opacity="0.7"/>
+                <path d="M35,72 Q52,40 66,10" fill="none" stroke="#b8a4d3" stroke-width="0.55" opacity="0.28"/>
+                <path d="M46,48 Q52,40 58,32" fill="none" stroke="#c4b0db" stroke-width="0.3" opacity="0.16"/>
+                <path d="M54,36 Q58,28 62,22" fill="none" stroke="#c4b0db" stroke-width="0.25" opacity="0.13"/>
+                <path d="M42,56 Q46,50 50,44" fill="none" stroke="#c4b0db" stroke-width="0.25" opacity="0.12"/>
+                <path d="M79,2 C83,-2 81,-4 76,2" fill="none" stroke="#b8a4d3" stroke-width="0.7" opacity="0.38" stroke-linecap="round"/>
+                <path d="M42,62 C46,52 54,38 62,24" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="2.5" stroke-linecap="round" opacity="0.35"/>
+
+                <!-- PÉTALO 3 Derecho amplio — horizontal -->
+                <path d="M35,72 C50,63 72,52 92,46 C104,42 112,44 112,52
+                         C112,60 104,64 90,66 C70,70 50,72 35,72 Z"
+                      fill="url(#petalGrad1)" stroke="#b8a4d3" stroke-width="1.1" stroke-linecap="round" opacity="0.65"/>
+                <path d="M35,72 Q72,54 104,46" fill="none" stroke="#b8a4d3" stroke-width="0.5" opacity="0.24"/>
+                <path d="M60,62 Q72,56 84,52" fill="none" stroke="#c4b0db" stroke-width="0.3" opacity="0.15"/>
+                <path d="M74,58 Q82,54 92,50" fill="none" stroke="#c4b0db" stroke-width="0.25" opacity="0.12"/>
+                <path d="M112,52 C116,48 116,44 112,42" fill="none" stroke="#b8a4d3" stroke-width="0.6" opacity="0.32" stroke-linecap="round"/>
+
+                <!-- PÉTALO 4 Lateral izquierdo — arqueado -->
+                <path d="M35,72 C23,65 10,54 2,44 C-4,36 -4,28 2,26
+                         C8,24 16,32 24,44 C30,54 34,66 35,72 Z"
+                      fill="url(#petalGrad2)" stroke="#b8a4d3" stroke-width="1" stroke-linecap="round" opacity="0.55"/>
+                <path d="M35,72 Q16,54 4,40" fill="none" stroke="#b8a4d3" stroke-width="0.45" opacity="0.22"/>
+                <path d="M20,54 Q14,48 8,42" fill="none" stroke="#c4b0db" stroke-width="0.25" opacity="0.12"/>
+                <path d="M2,26 C-2,24 -2,28 2,32" fill="none" stroke="#b8a4d3" stroke-width="0.5" opacity="0.25" stroke-linecap="round"/>
+
+                <!-- PÉTALO 5 Inferior derecho — caída grácil -->
+                <path d="M35,72 C45,80 58,96 64,110 C68,120 66,126 60,124
+                         C54,122 46,108 42,96 C38,86 36,78 35,72 Z"
+                      fill="url(#petalGrad1)" stroke="#b8a4d3" stroke-width="1" stroke-linecap="round" opacity="0.55"/>
+                <path d="M35,72 Q54,94 64,114" fill="none" stroke="#b8a4d3" stroke-width="0.45" opacity="0.22"/>
+                <path d="M48,88 Q52,94 56,100" fill="none" stroke="#c4b0db" stroke-width="0.25" opacity="0.12"/>
+                <path d="M60,124 C64,126 64,122 60,116" fill="none" stroke="#b8a4d3" stroke-width="0.55" opacity="0.28" stroke-linecap="round"/>
+
+                <!-- PÉTALO 6 Inferior izquierdo — elegante -->
+                <path d="M35,72 C25,78 12,90 4,102 C-2,112 -4,118 2,120
+                         C8,122 16,112 24,100 C30,88 34,78 35,72 Z"
+                      fill="url(#petalGrad2)" stroke="#b8a4d3" stroke-width="0.95" stroke-linecap="round" opacity="0.5"/>
+                <path d="M35,72 Q16,90 2,106" fill="none" stroke="#b8a4d3" stroke-width="0.42" opacity="0.2"/>
+                <path d="M18,90 Q12,96 6,104" fill="none" stroke="#c4b0db" stroke-width="0.25" opacity="0.12"/>
+
+                <!-- ===== MANCHAS OSCURAS BOTÁNICAS ===== -->
+                <g opacity="0.55">
+                    <circle cx="18" cy="28" r="1.6" fill="#9083ab"/>
+                    <circle cx="22" cy="22" r="1.3" fill="#9083ab"/>
+                    <circle cx="14" cy="34" r="1.4" fill="#9083ab"/>
+                    <circle cx="26" cy="34" r="1" fill="#9083ab"/>
+                    <circle cx="12" cy="22" r="0.8" fill="#9083ab"/>
+                    <circle cx="20" cy="40" r="0.9" fill="#9083ab"/>
+                    <ellipse cx="16" cy="30" rx="0.6" ry="1" fill="#9083ab" transform="rotate(-30,16,30)"/>
+                    <circle cx="50" cy="28" r="1.4" fill="#9083ab"/>
+                    <circle cx="46" cy="34" r="1.1" fill="#9083ab"/>
+                    <circle cx="56" cy="22" r="1" fill="#9083ab"/>
+                    <circle cx="48" cy="42" r="1.2" fill="#9083ab"/>
+                    <circle cx="54" cy="30" r="0.7" fill="#9083ab"/>
+                    <circle cx="44" cy="48" r="0.8" fill="#9083ab"/>
+                    <ellipse cx="52" cy="26" rx="0.5" ry="0.9" fill="#9083ab" transform="rotate(25,52,26)"/>
+                    <circle cx="68" cy="56" r="1.3" fill="#9083ab"/>
+                    <circle cx="78" cy="52" r="1.1" fill="#9083ab"/>
+                    <circle cx="62" cy="60" r="1" fill="#9083ab"/>
+                    <circle cx="88" cy="50" r="0.8" fill="#9083ab"/>
+                    <circle cx="72" cy="60" r="0.7" fill="#9083ab"/>
+                    <circle cx="82" cy="54" r="0.9" fill="#9083ab"/>
+                    <circle cx="46" cy="86" r="1.1" fill="#9083ab"/>
+                    <circle cx="50" cy="92" r="0.9" fill="#9083ab"/>
+                    <circle cx="44" cy="94" r="0.7" fill="#9083ab"/>
+                    <circle cx="18" cy="88" r="1" fill="#9083ab"/>
+                    <circle cx="14" cy="94" r="0.8" fill="#9083ab"/>
+                    <circle cx="22" cy="82" r="0.7" fill="#9083ab"/>
+                    <circle cx="14" cy="48" r="0.9" fill="#9083ab"/>
+                    <circle cx="10" cy="42" r="0.7" fill="#9083ab"/>
+                    <circle cx="18" cy="54" r="0.8" fill="#9083ab"/>
+                </g>
+
+                <!-- ===== ESTAMBRES CON ANTERAS ÁMBAR ===== -->
+                <g stroke-linecap="round">
+                    <path d="M35,72 C27,55 20,40 16,32" fill="none" stroke="#c9b8de" stroke-width="0.9" opacity="0.5"/>
+                    <ellipse cx="16" cy="32" rx="3.5" ry="1.8" fill="#c4956a" opacity="0.55" transform="rotate(-58,16,32)"/>
+                    <ellipse cx="15.4" cy="31.1" rx="2" ry="0.8" fill="#dab88a" opacity="0.3" transform="rotate(-58,15.4,31.1)"/>
+                    <circle cx="14.8" cy="30.2" r="0.4" fill="#e8c878" opacity="0.4"/>
+                    <circle cx="17" cy="33.2" r="0.3" fill="#e8c878" opacity="0.3"/>
+
+                    <path d="M35,72 C41,53 48,38 50,30" fill="none" stroke="#c9b8de" stroke-width="0.9" opacity="0.5"/>
+                    <ellipse cx="50" cy="30" rx="3.5" ry="1.8" fill="#c4956a" opacity="0.55" transform="rotate(-5,50,30)"/>
+                    <ellipse cx="50" cy="29.1" rx="2" ry="0.8" fill="#dab88a" opacity="0.3" transform="rotate(-5,50,29.1)"/>
+                    <circle cx="49" cy="28.5" r="0.35" fill="#e8c878" opacity="0.38"/>
+                    <circle cx="51.5" cy="30.8" r="0.3" fill="#e8c878" opacity="0.28"/>
+
+                    <path d="M35,72 C47,61 60,50 66,44" fill="none" stroke="#c9b8de" stroke-width="0.8" opacity="0.48"/>
+                    <ellipse cx="66" cy="44" rx="3" ry="1.5" fill="#c4956a" opacity="0.52" transform="rotate(35,66,44)"/>
+                    <circle cx="67" cy="42.8" r="0.3" fill="#e8c878" opacity="0.35"/>
+
+                    <path d="M35,72 C25,63 14,52 10,46" fill="none" stroke="#c9b8de" stroke-width="0.7" opacity="0.42"/>
+                    <ellipse cx="10" cy="46" rx="2.8" ry="1.3" fill="#c4956a" opacity="0.46" transform="rotate(-72,10,46)"/>
+                    <circle cx="9" cy="44.8" r="0.25" fill="#e8c878" opacity="0.3"/>
+
+                    <path d="M35,72 C45,63 56,52 60,46" fill="none" stroke="#c9b8de" stroke-width="0.7" opacity="0.4"/>
+                    <ellipse cx="60" cy="46" rx="2.8" ry="1.3" fill="#c4956a" opacity="0.46" transform="rotate(45,60,46)"/>
+
+                    <path d="M35,72 C38,56 42,42 44,36" fill="none" stroke="#c9b8de" stroke-width="0.6" opacity="0.35"/>
+                    <ellipse cx="44" cy="36" rx="2.2" ry="1.1" fill="#c4956a" opacity="0.4" transform="rotate(10,44,36)"/>
+
+                    <!-- Pistilo central -->
+                    <path d="M35,72 C31,56 26,42 24,34" fill="none" stroke="#b8a4d3" stroke-width="1.1" opacity="0.55"/>
+                    <circle cx="24" cy="34" r="2.8" fill="#b8a4d3" opacity="0.5"/>
+                    <circle cx="24" cy="34" r="1.4" fill="#9083ab" opacity="0.3"/>
+                    <circle cx="23.3" cy="33" r="0.5" fill="#ede3f7" opacity="0.4"/>
+                    <circle cx="24.7" cy="33.2" r="0.4" fill="#ede3f7" opacity="0.35"/>
+                    <circle cx="24" cy="34.5" r="0.35" fill="#ede3f7" opacity="0.3"/>
+                    <!-- Gotas de néctar en pistilo -->
+                    <circle cx="23.5" cy="35.5" r="0.2" fill="#ddd0ee" opacity="0.25"/>
+                    <circle cx="24.5" cy="35.2" r="0.15" fill="#ddd0ee" opacity="0.2"/>
+                </g>
+
+                <!-- ===== GOTAS DE ROCÍO ===== -->
+                <g>
+                    <circle cx="22" cy="24" r="1.4" fill="rgba(255,255,255,0.12)" stroke="rgba(255,255,255,0.06)" stroke-width="0.3"/>
+                    <circle cx="21.5" cy="23.3" r="0.4" fill="rgba(255,255,255,0.28)"/>
+                    <circle cx="58" cy="20" r="1.1" fill="rgba(255,255,255,0.1)" stroke="rgba(255,255,255,0.05)" stroke-width="0.25"/>
+                    <circle cx="57.6" cy="19.4" r="0.3" fill="rgba(255,255,255,0.25)"/>
+                    <circle cx="76" cy="52" r="0.9" fill="rgba(255,255,255,0.08)" stroke="rgba(255,255,255,0.04)" stroke-width="0.2"/>
+                    <circle cx="75.7" cy="51.5" r="0.22" fill="rgba(255,255,255,0.2)"/>
+                    <circle cx="42" cy="88" r="0.8" fill="rgba(255,255,255,0.07)" stroke="rgba(255,255,255,0.04)" stroke-width="0.2"/>
+                    <circle cx="41.7" cy="87.5" r="0.2" fill="rgba(255,255,255,0.18)"/>
+                </g>
+
+                <!-- ===== MANCHAS ALARGADAS (pinceladas botánicas) ===== -->
+                <g opacity="0.22">
+                    <ellipse cx="25" cy="38" rx="0.5" ry="2" fill="#9083ab" transform="rotate(-15,25,38)"/>
+                    <ellipse cx="52" cy="26" rx="0.4" ry="1.6" fill="#9083ab" transform="rotate(10,52,26)"/>
+                    <ellipse cx="70" cy="56" rx="0.5" ry="1.8" fill="#9083ab" transform="rotate(30,70,56)"/>
+                    <ellipse cx="48" cy="90" rx="0.4" ry="1.4" fill="#9083ab" transform="rotate(-8,48,90)"/>
+                    <ellipse cx="14" cy="50" rx="0.4" ry="1.3" fill="#9083ab" transform="rotate(-25,14,50)"/>
+                </g>
+
+                <!-- ===== NUBE DE POLEN DIFUSO ===== -->
+                <g filter="url(#softGlow)" opacity="0.1">
+                    <circle cx="16" cy="30" r="3" fill="#e8c878"/>
+                    <circle cx="50" cy="28" r="2.8" fill="#e8c878"/>
+                    <circle cx="66" cy="42" r="2.5" fill="#e8c878"/>
+                    <circle cx="24" cy="33" r="2" fill="#e8c878"/>
+                </g>
+
+                <!-- ===== TEXTURA DE BORDES PÉTALOS (ondulación orgánica) ===== -->
+                <g opacity="0.2" fill="none" stroke="#c4b0db" stroke-width="0.3" stroke-linecap="round">
+                    <path d="M10,0 C8,2 6,1 4,3 C2,5 0,4 -1,6"/>
+                    <path d="M79,2 C81,4 83,3 85,5"/>
+                    <path d="M112,52 C113,54 112,56 110,58"/>
+                    <path d="M60,124 C58,126 56,125 54,127"/>
+                    <path d="M2,120 C4,122 6,121 8,123"/>
+                </g>
+
+            </symbol>
+        </defs>
+    </svg>
+
+    <script src="script.js"></script>
+</body>
+</html>
