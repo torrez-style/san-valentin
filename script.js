@@ -766,7 +766,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
         const scrollContainer = document.getElementById('letterScroll');
 
-        const charDelay = 35; // ms por carácter
+        const charDelay = 55; // ms por carácter
         allChars.forEach((char, i) => {
             setTimeout(() => {
                 char.classList.add('visible');
